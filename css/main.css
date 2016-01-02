@@ -296,17 +296,28 @@ body {
 	box-sizing: border-box;
 	position: relative;
 	width: 100%;
-	max-width: 800px;
+	max-width: 1000px;
 	margin: auto;
 }
 
 header {
 	background-color: black;
+    height: 3.75em;
 }
 
-header a {
+header .layout-wrap {
+    box-sizing: border-box;
+    padding: 1em;
+    height: 100%;
+}
+
+header .logo {
 	display: inline-block;
-	padding: 1em;
+    height: 100%;
+}
+
+header .logo img {
+    height: 100%;
 }
 
 header .search-box {
@@ -319,23 +330,36 @@ header .search-box {
 
 .page-body {
 	background-color: rgba(100, 100, 100, 0.5);
+    padding: 1em;
+    padding-bottom: 0;
+}
+
+nav {
+    margin-bottom: 1em;
+    height: 8em;
 }
 
 .nav-section {
 	box-sizing: border-box;
 	display: inline-block;
 	position: relative;
-	width: 30.33333%;
+	width: 31.33333%;
 	float: left;
-	height: 8em;
-	margin: 1.5%;
-    margin-top: 1em;
-    margin-bottom: 1em;
+	height: 100%;   
+    margin-right: 1.5%;
+    margin-left: 1.5%;
 	background-color: black;
 	background-repeat: no-repeat;
 	background-size: 6em;
 	background-position: center 3em;
 	z-index: 1;
+}
+
+.nav-section:first-child {
+    margin-left: 0;
+}
+.nav-section:last-child {
+    margin-right: 0;
 }
 
 .nav-section:hover {
@@ -403,32 +427,53 @@ header .search-box {
 	border-bottom: solid 1px #EBEBEB;
 }
 
-.tabs ul {
+.tabs > ul {
 	list-style: none;
 	padding-left: 0;
 	margin: 0;
+    height: 2em;
 }
 
-.tabs li {
+.tabs > ul > li {
 	box-sizing: border-box;
 	display: inline-block;
-	width: 22%;
-    margin: 1.5%;
-    margin-top: 1em;
-    margin-bottom: 0;
+	width: 22.75%;
+    margin-left: 1.5%;
+    margin-right: 1.5%;
 	float: left;
 	background-color: #646464;
     text-align: center;
 }
 
-.tabs li a {
+.tabs > ul > li:first-child {
+    margin-left: 0;
+}
+.tabs > ul > li:last-child {
+    margin-right: 0;
+}
+
+.tabs > ul > li a {
     display: inline-block;
     width: 100%;
     color: white;
     line-height: 2em;
 }
 
-#quick-reports[target] {
+.tab {
+    background-color: #EBEBEB;
+    padding: 1em;
+    min-height: 25em;
+}
+
+.tab iframe {
+    width: 100%;
+    height: 60em;
+}
+
+.tab .test {
+    content: "hi";
+    width: 100%;
+    height: 30em;
     background-color: red;
 }
 
@@ -528,4 +573,10 @@ header .search-box {
 .u-plain-link:hover,
 .u-plain-link:active {
     text-decoration: none;  
+}
+
+.u-full-size {
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
 }

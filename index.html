@@ -13,11 +13,12 @@
         <link rel="stylesheet" href="css/normalize.css">
         <link rel="stylesheet" href="css/main.css">
         <script src="js/vendor/modernizr-2.8.3.min.js"></script>
+        <script src="js/main.js"></script>
     </head>
     <body>
         <header>
 			<div class="layout-wrap">
-				<a href="#"><img src="https://googledrive.com/host/0B6ZIsommzsgVMVA2MzdKUjN2S0U/logo-netcraft.svg" alt="netcraft"></a>
+				<a href="#" class="logo"><img src="https://googledrive.com/host/0B6ZIsommzsgVMVA2MzdKUjN2S0U/logo-netcraft.svg" alt="netcraft"></a>
 
 			    <form class="search-box" method="get" action="http://www.google.com">
 			        <input type="search" name="q" placeholder="search">
@@ -29,7 +30,7 @@
 		    <div class="notifications">
 		    </div>
 
-		    <nav>
+		    <nav class="u-clear-fix">
 		        <div class="nav-section" id="nav-1th-section">
 		            <p>Select Reporting Platform</p>
 
@@ -88,7 +89,7 @@
 		        </div>
 		    </nav>
 
-		    <div class="tabs u-clear-float">
+		    <div class="tabs u-clear-float u-clear-fix">
 		        <ul class="u-clear-fix">
 		            <li><a href="#quick-reports" class="u-plain-link">Quick Reports</a>
 		            </li>
@@ -100,8 +101,8 @@
 		            </li>
 		        </ul>
 
-		        <div id="quick-reports">
-		        	<form class="urls-from u-clear-fix" action="" onsubmit="return validateUrlsForm(this)">
+		        <div class="tab" id="quick-reports">
+		        	<form class="urls-from u-clear-fix" action="" onsubmit="return submitUrlsFrom('quick-reports', this)">
 		        		<div class="url-form">
 		        			<span>Report 01</span>
 		        			<div class="text-box"><span>Name</span><input type="text" class="name"></div>
@@ -121,13 +122,15 @@
 		        	</form>
 		        </div>
 
-		        <div id="fmy-folders">
+		        <div class="tab" id="fmy-folders">
+		        	<iframe src="" frameborder="0"></iframe>
 		        </div>
 
-		        <div id="my-team-folders">
+		        <div class="tab" id="my-team-folders">
+		        	<div class="test"></div>
 		        </div>
 
-		        <div id="public-folders">
+		        <div class="tab" id="public-folders">
 		        </div>
 		    </div>
 		</div>
@@ -135,7 +138,6 @@
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
         <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.11.3.min.js"><\/script>')</script>
         <script src="js/plugins.js"></script>
-        <script src="js/main.js"></script>
 
         <!-- Google Analytics: change UA-XXXXX-X to be your site's ID. -->
         <script>

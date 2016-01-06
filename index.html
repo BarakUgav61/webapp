@@ -102,6 +102,14 @@
 		        </ul>
 
 		        <div class="tab" id="quick-reports">
+		        	<div class="toolbar">
+		        		<select id="sites" onchange="siteChange()">
+		        		</select>
+
+		        		<a class="u-plain-link" id="settingLink">Setting</a>
+		        		<a class="u-plain-link" id="goToLink">GoTo Site</a>
+		        	</div>
+
 		        	<form class="urls-from u-clear-fix" action="" onsubmit="return submitUrlsFrom('quick-reports', this)">
 		        		<div class="url-form">
 		        			<span>Report 01</span>
@@ -120,10 +128,11 @@
 		        		</div>
 		        		<input type="submit" value="save">
 		        	</form>
+
+		        	<iframe src="" frameborder="0"></iframe>
 		        </div>
 
 		        <div class="tab" id="fmy-folders">
-		        	<iframe src="" frameborder="0"></iframe>
 		        </div>
 
 		        <div class="tab" id="my-team-folders">

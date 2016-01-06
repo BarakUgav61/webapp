@@ -4,25 +4,88 @@ window.onload = function () {
 	    document.location.hash = "#quick-reports";
 	}
 
-	// Load 
+	reloadAll();
+};
+
+function func() {
+	window.alert("test");
+}
+
+function reloadAll() {
+	reloadForms();
+	reloadComboboxes();
+}
+
+function reloadForms() {
 	var quickReports = document.getElementById("quick-reports");
 	var urlsFrom = quickReports.getElementsByClassName("urls-from")[0];
 	loadUrlsFrom("quick-reports", urlsFrom);
-};
+}
 
+function reloadComboboxes() {
+	var quickReports = document.getElementById("quick-reports");
+	// var combobox = quickReports.getElementById("sites");
+	var combobox = quickReports.getElementsByTagName("select")[0];
+	loadCombobox("quick-reports", combobox);
+}
+
+function siteChange() {
+	var quickReports = document.getElementById("quick-reports");
+	var combobox = quickReports.getElementsByTagName("select")[0];
+	var iframe = quickReports.getElementsByTagName("iframe")[0];
+
+	var url = combobox.options[combobox.selectedIndex].value;
+	iframe.setAttribute("src", url);
+}
+
+function loadCombobox(tag, combobox) {
+	// Clear existing options
+	for (var i = combobox.options.length; i >= 0; i--) {
+		combobox.remove(i);
+	}
+
+	// Read from local storage
+	var sites = readLocalStorage(tag);
+	if (sites === undefined) {
+		return;
+	} else if (!(sites.length > 0)) {
+		combobox.style.display = "none";
+		return;
+	}
+
+	for (var i = 0; i < sites.length; i++) {
+		var site = sites[i];
+		var option = document.createElement("option");
+		option.text = site.name;
+		option.value = site.url;
+		combobox.add(option);
+	}
+}
 
 function loadUrlsFrom(tag, form) {
+	var subForms = form.getElementsByClassName("url-form");
+
+	// Clear existing text
+	for (var i = 0; i < subForms.length; i++) {
+		var subForm = subForms[i];
+		var nameBox = subForm.getElementsByClassName("name")[0];
+		var urlBox = subForm.getElementsByClassName("url")[0];
+		nameBox.setAttribute("value", "");
+		urlBox.setAttribute("value", "");
+	}
+
+	// Read from local storage
 	var sites = readLocalStorage(tag);
 	if (sites === undefined) {
 		return;
 	} else if (!(sites.length > 0)) {
 		return;
 	}
-
-	var subForms = form.getElementsByClassName("url-form");
+	
+	// Put new data in form
 	for (var i = 0; i < subForms.length && i < sites.length; i++) {
-		var subForm = subForms[i];
 		var site = sites[i];
+		var subForm = subForms[i];
 
 		var nameBox = subForm.getElementsByClassName("name")[0];
 		var urlBox = subForm.getElementsByClassName("url")[0];
@@ -72,6 +135,7 @@ function submitUrlsFrom(tag, form) {
 	} else {
 		// valid
 		writeLocalStorage(tag, sites);
+		reloadAll();
 	}
 
 }

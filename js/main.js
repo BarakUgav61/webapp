@@ -3,30 +3,39 @@ window.onload = function () {
 	if (document.location.hash == "" || document.location.hash == "#") {
 	    document.location.hash = "#quick-reports";
 	}
-
 	reloadAll();
 };
 
-function func() {
-	window.alert("test");
-}
-
 function reloadAll() {
 	reloadForms();
-	reloadComboboxes();
+	reloadToolBars();
+	reloadSelectedTab();
 }
 
 function reloadForms() {
 	var quickReports = document.getElementById("quick-reports");
 	var urlsFrom = quickReports.getElementsByClassName("urls-from")[0];
 	loadUrlsFrom("quick-reports", urlsFrom);
+
+	var teamFolders = document.getElementById("my-team-folders");
+	urlsFrom = teamFolders.getElementsByClassName("urls-from")[0];
+	loadUrlsFrom("my-team-folders", urlsFrom);
+}
+
+function reloadToolBars() {
+	reloadComboboxes();
+	siteChange();
+	reloadGoto();
 }
 
 function reloadComboboxes() {
 	var quickReports = document.getElementById("quick-reports");
-	// var combobox = quickReports.getElementById("sites");
 	var combobox = quickReports.getElementsByTagName("select")[0];
 	loadCombobox("quick-reports", combobox);
+
+	var teamFolders = document.getElementById("my-team-folders");
+	combobox = teamFolders.getElementsByTagName("select")[0];
+	loadCombobox("my-team-folders", combobox);
 }
 
 function siteChange() {
@@ -34,8 +43,61 @@ function siteChange() {
 	var combobox = quickReports.getElementsByTagName("select")[0];
 	var iframe = quickReports.getElementsByTagName("iframe")[0];
 
-	var url = combobox.options[combobox.selectedIndex].value;
-	iframe.setAttribute("src", url);
+	var selectedIndex = combobox.selectedIndex;
+	if (selectedIndex !== -1) {
+		var url = combobox.options[selectedIndex].value;
+		iframe.setAttribute("src", url);
+		iframe.style.display ="block";
+	} else {
+		iframe.setAttribute("src", "");
+		iframe.style.display = "none";
+	}
+
+	var teamFolders = document.getElementById("my-team-folders");
+	combobox = teamFolders.getElementsByTagName("select")[0];
+	iframe = teamFolders.getElementsByTagName("iframe")[0];
+
+	var selectedIndex = combobox.selectedIndex;
+	if (selectedIndex !== -1) {
+		var url = combobox.options[selectedIndex].value;
+		iframe.setAttribute("src", url);
+		iframe.style.display ="block";
+	} else {
+		iframe.setAttribute("src", "");
+		iframe.style.display = "none";
+	}
+
+	
+}
+
+function reloadGoto() {
+	var quickReports = document.getElementById("quick-reports");
+	var goToLink = quickReports.getElementsByClassName("goToLink")[0];
+	var combobox = quickReports.getElementsByTagName("select")[0];
+
+	var selectedIndex = combobox.selectedIndex;
+	if (selectedIndex !== -1) {
+		var url = combobox.options[selectedIndex].value;
+		goToLink.setAttribute("href", url);
+		goToLink.style.display ="inline-block";
+	} else {
+		goToLink.setAttribute("href", "");
+		goToLink.style.display = "none";
+	}
+
+	var teamFolders = document.getElementById("my-team-folders");
+	goToLink = teamFolders.getElementsByClassName("goToLink")[0];
+	combobox = teamFolders.getElementsByTagName("select")[0];
+
+	selectedIndex = combobox.selectedIndex;
+	if (selectedIndex !== -1) {
+		var url = combobox.options[selectedIndex].value;
+		goToLink.setAttribute("href", url);
+		goToLink.style.display ="inline-block";
+	} else {
+		goToLink.setAttribute("href", "");
+		goToLink.style.display = "none";
+	}
 }
 
 function loadCombobox(tag, combobox) {
@@ -43,16 +105,18 @@ function loadCombobox(tag, combobox) {
 	for (var i = combobox.options.length; i >= 0; i--) {
 		combobox.remove(i);
 	}
+	combobox.style.display = "none";
 
 	// Read from local storage
 	var sites = readLocalStorage(tag);
 	if (sites === undefined) {
 		return;
 	} else if (!(sites.length > 0)) {
-		combobox.style.display = "none";
 		return;
 	}
 
+	// Length > 0
+	combobox.style.display = "inline-block";
 	for (var i = 0; i < sites.length; i++) {
 		var site = sites[i];
 		var option = document.createElement("option");
@@ -228,4 +292,52 @@ function clearLocalStorage(tag) {
 		localStorage.removeItem(tag + " " + i + " url");
 	}
 	localStorage.removeItem(tag + " count");
+}
+
+function quickReportsSetting() {
+	var quickReports = document.getElementById("quick-reports");
+	var urlsFrom = quickReports.getElementsByClassName("urls-from")[0];
+	if (urlsFrom.style.display === "none") {
+		urlsFrom.style.display = "inline-block";
+	} else {
+		urlsFrom.style.display = "none";
+	}
+}
+
+function teamFoldersSetting() {
+	var quickReports = document.getElementById("my-team-folders");
+	var urlsFrom = quickReports.getElementsByClassName("urls-from")[0];
+	if (urlsFrom.style.display === "none") {
+		urlsFrom.style.display = "inline-block";
+	} else {
+		urlsFrom.style.display = "none";
+	}
+}
+
+function tabSelect(e) {
+	// TODO
+	// Prevent jump
+	e.preventDefault();
+	var selectedTab = e.currentTarget;
+	document.location.hash = selectedTab.hash;
+
+	reloadSelectedTab();
+}
+
+function reloadSelectedTab() {
+	var currentHash = document.location.hash;
+	var tabs = document.getElementsByClassName("tabs")[0];
+    var tabsSelectorsList = tabs.getElementsByTagName("ul")[0];
+    var allTabs = tabsSelectorsList.getElementsByTagName("a");
+
+    for (var i = 0; i < allTabs.length; i++) {
+    	var tab = allTabs[i];
+    	if (tab.hash === currentHash) {
+    		tab.style.backgroundColor = "#EBEBEB";
+    		tab.style.color = "black";
+    	} else {
+    		tab.style.backgroundColor = "#646464";
+    		tab.style.color = "white";
+    	}
+    }
 }

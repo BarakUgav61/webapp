@@ -18,7 +18,7 @@
     <body>
         <header>
 			<div class="layout-wrap">
-				<a href="#" class="logo"><img src="https://googledrive.com/host/0B6ZIsommzsgVMVA2MzdKUjN2S0U/logo-netcraft.svg" alt="netcraft"></a>
+				<a href="#" class="logo u-hide-text">netcraft<img src="https://googledrive.com/host/0B6ZIsommzsgVMVA2MzdKUjN2S0U/logo-netcraft.svg" alt="netcraft"></a>
 
 			    <form class="search-box" method="get" action="http://www.google.com">
 			        <input type="search" name="q" placeholder="search">
@@ -32,7 +32,7 @@
 
 		    <nav class="u-clear-fix">
 		        <div class="nav-section" id="nav-1th-section">
-		            <p>Select Reporting Platform</p>
+		            <p>Select <br>Reporting Platform</p>
 
 		            <div class="menu">
 		                <div class="menu-hint">
@@ -51,7 +51,7 @@
 		        </div>
 
 		        <div class="nav-section" id="nav-2th-section">
-		            <p>Select Dashboard</p>
+		            <p>Select <br>Dashboard</p>
 
 		            <div class="menu">
 		                <div class="menu-hint">
@@ -70,7 +70,7 @@
 		        </div>
 
 		        <div class="nav-section" id="nav-3th-section">
-		            <p>Help &amp; Tutorials</p>
+		            <p>Help &amp; <br>Tutorials</p>
 
 		            <div class="menu">
 		                <div class="menu-hint">
@@ -91,13 +91,13 @@
 
 		    <div class="tabs u-clear-float u-clear-fix">
 		        <ul class="u-clear-fix">
-		            <li><a href="#quick-reports" class="u-plain-link">Quick Reports</a>
+		            <li><a href="#quick-reports" onclick="tabSelect(event)" class="u-plain-link">Quick Reports</a>
 		            </li>
-		            <li><a href="#fmy-folders" class="u-plain-link">My Folders</a>
+		            <li><a href="#fmy-folders" onclick="tabSelect(event)" class="u-plain-link">My Folders</a>
 		            </li>
-		            <li><a href="#my-team-folders" class="u-plain-link">My Team Folders</a>
+		            <li><a href="#my-team-folders" onclick="tabSelect(event)" class="u-plain-link">My Team Folders</a>
 		            </li>
-		            <li><a href="#public-folders" class="u-plain-link">Public Folders</a>
+		            <li><a href="#public-folders" onclick="tabSelect(event)" class="u-plain-link">Public Folders</a>
 		            </li>
 		        </ul>
 
@@ -106,37 +106,68 @@
 		        		<select id="sites" onchange="siteChange()">
 		        		</select>
 
-		        		<a class="u-plain-link" id="settingLink">Setting</a>
-		        		<a class="u-plain-link" id="goToLink">GoTo Site</a>
+		        		<a class="u-plain-link settingLink" onclick="quickReportsSetting()">Setting</a>
+		        		<a class="u-plain-link goToLink">GoTo Site</a>
 		        	</div>
+	
+					<div class="tab-body">
+			        	<form class="urls-from u-clear-fix" action="" onsubmit="return submitUrlsFrom('quick-reports', this)">
+			        		<div class="url-form">
+			        			<span>Report 01</span>
+			        			<div class="text-box"><span>Name</span><input type="text" class="name"></div>
+			        			<div class="text-box"><span>URL</span><input type="text" class="url"></div>
+			        		</div>
+			        		<div class="url-form">
+			        			<span>Report 02</span>
+			        			<div class="text-box"><span>Name</span><input type="text" class="name"></div>
+			        			<div class="text-box"><span>URL</span><input type="text" class="url"></div>
+			        		</div>
+			        		<div class="url-form">
+			        			<span>Report 03</span>
+			        			<div class="text-box"><span>Name</span><input type="text" class="name"></div>
+			        			<div class="text-box"><span>URL</span><input type="text" class="url"></div>
+			        		</div>
+			        		<input type="submit" value="save">
+			        	</form>
 
-		        	<form class="urls-from u-clear-fix" action="" onsubmit="return submitUrlsFrom('quick-reports', this)">
-		        		<div class="url-form">
-		        			<span>Report 01</span>
-		        			<div class="text-box"><span>Name</span><input type="text" class="name"></div>
-		        			<div class="text-box"><span>URL</span><input type="text" class="url"></div>
-		        		</div>
-		        		<div class="url-form">
-		        			<span>Report 02</span>
-		        			<div class="text-box"><span>Name</span><input type="text" class="name"></div>
-		        			<div class="text-box"><span>URL</span><input type="text" class="url"></div>
-		        		</div>
-		        		<div class="url-form">
-		        			<span>Report 03</span>
-		        			<div class="text-box"><span>Name</span><input type="text" class="name"></div>
-		        			<div class="text-box"><span>URL</span><input type="text" class="url"></div>
-		        		</div>
-		        		<input type="submit" value="save">
-		        	</form>
-
-		        	<iframe src="" frameborder="0"></iframe>
+			        	<iframe src="" frameborder="0"></iframe>
+		        	</div>
 		        </div>
 
 		        <div class="tab" id="fmy-folders">
 		        </div>
 
 		        <div class="tab" id="my-team-folders">
-		        	<div class="test"></div>
+		        	<div class="toolbar">
+		        		<select id="sites" onchange="siteChange()">
+		        		</select>
+
+		        		<a class="u-plain-link settingLink" onclick="teamFoldersSetting()">Setting</a>
+		        		<a class="u-plain-link goToLink">GoTo Site</a>
+		        	</div>
+	
+					<div class="tab-body">
+			        	<form class="urls-from u-clear-fix" action="" onsubmit="return submitUrlsFrom('my-team-folders', this)">
+			        		<div class="url-form">
+			        			<span>Report 01</span>
+			        			<div class="text-box"><span>Name</span><input type="text" class="name"></div>
+			        			<div class="text-box"><span>URL</span><input type="text" class="url"></div>
+			        		</div>
+			        		<div class="url-form">
+			        			<span>Report 02</span>
+			        			<div class="text-box"><span>Name</span><input type="text" class="name"></div>
+			        			<div class="text-box"><span>URL</span><input type="text" class="url"></div>
+			        		</div>
+			        		<div class="url-form">
+			        			<span>Report 03</span>
+			        			<div class="text-box"><span>Name</span><input type="text" class="name"></div>
+			        			<div class="text-box"><span>URL</span><input type="text" class="url"></div>
+			        		</div>
+			        		<input type="submit" value="save">
+			        	</form>
+
+			        	<iframe src="" frameborder="0"></iframe>
+		        	</div>
 		        </div>
 
 		        <div class="tab" id="public-folders">

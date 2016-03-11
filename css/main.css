@@ -262,6 +262,7 @@ nav {
     padding-left: 0;
     margin-top: 0;
     display: none;
+    background-color: rgba(255, 255, 255, 0.8);
 }
 
 .nav-section:hover .action-list {
@@ -269,8 +270,11 @@ nav {
 }
 
 .action-list li {
-    background-color: white;
     border-bottom: solid 1px #EBEBEB;
+}
+.action-list li a {
+    text-decoration: none;
+    color: black;
 }
 
 .tabs > ul {
@@ -309,34 +313,17 @@ nav {
     box-sizing: border-box;
     background-color: #EBEBEB;
     padding: 1em;
-    padding-bottom: 2em;
-    height: 30em;
 }
 
 .tab-body {
     width: 100%;
-    height: 100%;
     position: relative;
+    height: 40em;
 }
 
 .tab-body iframe {
-    display: none;
     width: 100%;
     height: 100%;
-}
-
-#quick-reports:not(:target),
-#fmy-folders:not(:target),
-#my-team-folders:not(:target),
-#public-folders:not(:target) {
-    display: none;
-}
-
-#quick-reports:target,
-#fmy-folders:target,
-#my-team-folders:target,
-#public-folders:target {
-    display: block;
 }
 
 .toolbar {

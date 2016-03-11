@@ -1,10 +1,22 @@
+
 window.onload = function () {
 	// Default '#quick-reports' tab
 	if (document.location.hash == "" || document.location.hash == "#") {
-	    document.location.hash = "#quick-reports";
+	    document.location.hash = "#/quick-reports";
 	}
+
+	var urlsFroms = document.getElementsByClassName("urls-from");
+	for (var i = 0; i < urlsFroms.length; i++) {
+		var form = urlsFroms[i];
+	}
+
 	reloadAll();
-};
+
+	var iframe = utility.getQuickReportsIFrame();
+	var loaded = iframe.getAttribute("src") !== "";
+	var urlsFrom = utility.getQuickReportsUrlsForm();
+	utility.toggleInline(urlsFrom, !loaded);
+}
 
 function reloadAll() {
 	reloadForms();
@@ -13,91 +25,76 @@ function reloadAll() {
 }
 
 function reloadForms() {
-	var quickReports = document.getElementById("quick-reports");
-	var urlsFrom = quickReports.getElementsByClassName("urls-from")[0];
+	var urlsFrom = utility.getQuickReportsUrlsForm();
 	loadUrlsFrom("quick-reports", urlsFrom);
 
-	var teamFolders = document.getElementById("my-team-folders");
-	urlsFrom = teamFolders.getElementsByClassName("urls-from")[0];
+	urlsFrom = utility.getMyTeamFoldersUrlsForm();
 	loadUrlsFrom("my-team-folders", urlsFrom);
 }
 
 function reloadToolBars() {
 	reloadComboboxes();
 	siteChange();
-	reloadGoto();
 }
 
 function reloadComboboxes() {
-	var quickReports = document.getElementById("quick-reports");
-	var combobox = quickReports.getElementsByTagName("select")[0];
+	var combobox = utility.getQuickReportsSiteSelector();
 	loadCombobox("quick-reports", combobox);
 
-	var teamFolders = document.getElementById("my-team-folders");
-	combobox = teamFolders.getElementsByTagName("select")[0];
+	combobox = utility.getMyTeamFoldersSiteSelector();
 	loadCombobox("my-team-folders", combobox);
 }
 
 function siteChange() {
-	var quickReports = document.getElementById("quick-reports");
-	var combobox = quickReports.getElementsByTagName("select")[0];
-	var iframe = quickReports.getElementsByTagName("iframe")[0];
+	var iframe, url, currentUrl;
 
-	var selectedIndex = combobox.selectedIndex;
-	if (selectedIndex !== -1) {
-		var url = combobox.options[selectedIndex].value;
+	iframe = utility.getQuickReportsIFrame();
+	url = utility.getQuickReportsSiteSelectorValue();
+	currentUrl = iframe.getAttribute("src");
+	if (currentUrl !== url) {
 		iframe.setAttribute("src", url);
-		iframe.style.display ="block";
-	} else {
-		iframe.setAttribute("src", "");
-		iframe.style.display = "none";
+		var urlsFrom = utility.getQuickReportsUrlsForm();
+		utility.toggleInline(urlsFrom, false);
 	}
+	utility.toggleInline(iframe, url !== "none");
 
-	var teamFolders = document.getElementById("my-team-folders");
-	combobox = teamFolders.getElementsByTagName("select")[0];
-	iframe = teamFolders.getElementsByTagName("iframe")[0];
-
-	var selectedIndex = combobox.selectedIndex;
-	if (selectedIndex !== -1) {
-		var url = combobox.options[selectedIndex].value;
+	iframe = utility.getMyTeamFoldersIFrame();
+	url = utility.getMyTeamFoldersSiteSelectorValue();
+	currentUrl = iframe.getAttribute("src");
+	if (currentUrl !== url) {
 		iframe.setAttribute("src", url);
-		iframe.style.display ="block";
-	} else {
-		iframe.setAttribute("src", "");
-		iframe.style.display = "none";
+		var urlsFrom = utility.getMyTeamFoldersUrlsForm();
+		utility.toggleInline(urlsFrom, false);
 	}
+	utility.toggleInline(iframe, url !== "none");
 
-	
+	reloadGoto();
 }
 
 function reloadGoto() {
-	var quickReports = document.getElementById("quick-reports");
-	var goToLink = quickReports.getElementsByClassName("goToLink")[0];
-	var combobox = quickReports.getElementsByTagName("select")[0];
+	var goToLink, iframe;
 
-	var selectedIndex = combobox.selectedIndex;
-	if (selectedIndex !== -1) {
-		var url = combobox.options[selectedIndex].value;
-		goToLink.setAttribute("href", url);
-		goToLink.style.display ="inline-block";
-	} else {
-		goToLink.setAttribute("href", "");
-		goToLink.style.display = "none";
-	}
+	goToLink = utility.getQuickReportsGotoLink();
+	iframe = utility.getQuickReportsIFrame();
+	reloadGotoLink(goToLink, iframe);
 
-	var teamFolders = document.getElementById("my-team-folders");
-	goToLink = teamFolders.getElementsByClassName("goToLink")[0];
-	combobox = teamFolders.getElementsByTagName("select")[0];
+	goToLink = utility.getMyFoldersGotoLink();
+	iframe = utility.getMyFoldersIFrame();
+	reloadGotoLink(goToLink, iframe);
 
-	selectedIndex = combobox.selectedIndex;
-	if (selectedIndex !== -1) {
-		var url = combobox.options[selectedIndex].value;
-		goToLink.setAttribute("href", url);
-		goToLink.style.display ="inline-block";
-	} else {
-		goToLink.setAttribute("href", "");
-		goToLink.style.display = "none";
-	}
+	goToLink = utility.getMyTeamFoldersGotoLink();
+	iframe = utility.getMyTeamFoldersIFrame();
+	reloadGotoLink(goToLink, iframe);
+
+	goToLink = utility.getPublicFoldersGotoLink();
+	iframe = utility.getPublicFoldersIFrame();
+	reloadGotoLink(goToLink, iframe);
+}
+
+function reloadGotoLink(link, iframe) {
+	url = iframe.getAttribute("src");
+	link.setAttribute("href", url);
+	utility.toggleInline(link, url !== "none");
 }
 
 function loadCombobox(tag, combobox) {
@@ -108,7 +105,7 @@ function loadCombobox(tag, combobox) {
 	combobox.style.display = "none";
 
 	// Read from local storage
-	var sites = readLocalStorage(tag);
+	var sites = storageUtility.readLocalStorage(tag);
 	if (sites === undefined) {
 		return;
 	} else if (!(sites.length > 0)) {
@@ -139,10 +136,8 @@ function loadUrlsFrom(tag, form) {
 	}
 
 	// Read from local storage
-	var sites = readLocalStorage(tag);
-	if (sites === undefined) {
-		return;
-	} else if (!(sites.length > 0)) {
+	var sites = storageUtility.readLocalStorage(tag);
+	if (sites === undefined || sites.length === 0) {
 		return;
 	}
 	
@@ -159,8 +154,9 @@ function loadUrlsFrom(tag, form) {
 	}
 }
 
-function submitUrlsFrom(tag, form) {
+function submitUrlsFrom(event, tag) {
 	// Validate
+	var form = event.target;
 	var subForms = form.getElementsByClassName("url-form");
 	var allValid = true;
 	var sites = [];
@@ -194,133 +190,35 @@ function submitUrlsFrom(tag, form) {
 		sites.push(site);
 	}
 
-	if (allValid !== true) {
-		return false;
-	} else {
-		// valid
-		writeLocalStorage(tag, sites);
+	if (allValid === true) {
+		storageUtility.writeLocalStorage(tag, sites);
 		reloadAll();
 	}
 
+	// Disable page reloading
+	return false;
 }
-
-function validateUrlsForm(form) {
-	var subForms = form.getElementsByClassName("url-form");
-
-	var allValid = true;
-	for (var subFormIndex in subForms) {
-		var subForm = subForms[subFormIndex];
-		var nameBox = subForm.getElementsByClassName("name")[0];
-		var urlBox = subForm.getElementsByClassName("url")[0];
-		var name = nameBox.value;
-		var url = urlBox.value;
-
-		resetInputBorder(nameBox);
-		resetInputBorder(urlBox);
-		if (name === "" && url === "") {
-			continue;
-		}
-
-		if (isValidName(name) !== true) {
-			nameBox.style.border = "solid 1px red";
-			allValid = false;
-		}
-
-		if (isValidUrl(url) !== true) {
-			urlBox.style.border = "solid 1px red";
-			allValid = false;
-		}
-	}
-	
-	return allValid;
-}
-
 function isValidName(name) {
 	return name !== "";
 }
-
 function isValidUrl(url) {
 	return url !== "";
 }
-
 function resetInputBorder(inputElement) {
 	inputElement.style.border = "2px inset";
 }
 
-function writeLocalStorage(tag, sites) {
-	clearLocalStorage(tag);
-
-	localStorage.setItem(tag + " count", sites.length);
-	for (var i = 0; i < sites.length; i++) {
-		var site = sites[i];
-		var name = site.name;
-		var url = site.url;
-
-		localStorage.setItem(tag + " " + i + " name", name);
-		localStorage.setItem(tag + " " + i + " url", url);
-	}
-}
-
-function readLocalStorage(tag) {
-	var countStr = localStorage.getItem(tag + " count");
-	if (countStr === undefined) {
-		return undefined;
-	}
-	var count = parseInt(countStr);
-
-	var sites = [];
-	for (var i = 0; i < count; i++) {
-		var name = localStorage.getItem(tag + " " + i + " name");
-		var url = localStorage.getItem(tag + " " + i + " url");
-
-		var site = {};
-		site.name = name;
-		site.url = url;
-		sites.push(site);
-	}
-	return sites;
-}
-
-function clearLocalStorage(tag) {
-	var countStr = localStorage.getItem(tag + " count");
-	if (countStr === null) {
-		return;
-	}
-	var count = parseInt(countStr);
-	for (var i = 0; i < count; i++) {
-		localStorage.removeItem(tag + " " + i + " name");
-		localStorage.removeItem(tag + " " + i + " url");
-	}
-	localStorage.removeItem(tag + " count");
-}
-
 function quickReportsSetting() {
-	var quickReports = document.getElementById("quick-reports");
-	var urlsFrom = quickReports.getElementsByClassName("urls-from")[0];
-	if (urlsFrom.style.display === "none") {
-		urlsFrom.style.display = "inline-block";
-	} else {
-		urlsFrom.style.display = "none";
-	}
+	var urlsFrom = utility.getQuickReportsUrlsForm();
+	utility.toggleInlineDefault(urlsFrom);
 }
-
 function teamFoldersSetting() {
-	var quickReports = document.getElementById("my-team-folders");
-	var urlsFrom = quickReports.getElementsByClassName("urls-from")[0];
-	if (urlsFrom.style.display === "none") {
-		urlsFrom.style.display = "inline-block";
-	} else {
-		urlsFrom.style.display = "none";
-	}
+	var urlsFrom = utility.getMyTeamFoldersUrlsForm();
+	utility.toggleInlineDefault(urlsFrom);
 }
 
 function tabSelect(e) {
-	// TODO
-	// Prevent jump
-	e.preventDefault();
-	var selectedTab = e.currentTarget;
-	document.location.hash = selectedTab.hash;
-
+	document.location.hash = e.target.hash;
 	reloadSelectedTab();
 }
 
@@ -340,4 +238,203 @@ function reloadSelectedTab() {
     		tab.style.color = "white";
     	}
     }
+
+    tabs = document.getElementsByClassName("tab");
+    for (var i = 0; i < tabs.length; i++) {
+    	var tab = tabs[i];
+    	var selected = ("#/" + tab.id) === currentHash;
+    	utility.toggleBlock(tab, selected);
+    }
 }
+
+/* -------------------- Utilities -------------------- */
+
+var utility = (function() {
+	var getQuickReports = function () {
+		return document.getElementById("quick-reports");
+	};
+	var getMyFolders = function () {
+		return document.getElementById("fmy-folders");
+	};
+	var getMyTeamFolders = function () {
+		return document.getElementById("my-team-folders");
+	};
+	var getPublicFolders = function () {
+		return document.getElementById("public-folders");
+	};
+
+	var getUrlsForm = function (parentElement) {
+		return parentElement.getElementsByClassName("urls-from")[0];
+	};
+	var getQuickReportsUrlsForm = function () {
+		return getUrlsForm(getQuickReports());
+	};
+	var getMyTeamFoldersUrlsForm = function () {
+		return getUrlsForm(getMyTeamFolders());
+	};
+
+	var getSiteSelector = function (parentElement) {
+		return parentElement.getElementsByTagName("select")[0];
+	}
+	var getQuickReportsSiteSelector = function () {
+		return getSiteSelector(getQuickReports());
+	};
+	var getMyTeamFoldersSiteSelector = function () {
+		return getSiteSelector(getMyTeamFolders());
+	};
+
+	var getSiteSelectorValue = function (siteSelector) {
+		var selectedIndex = siteSelector.selectedIndex;
+		if (selectedIndex !== -1) {
+			return siteSelector.options[selectedIndex].value;
+		} else {
+			return "";
+		}
+	}
+	var getQuickReportsSiteSelectorValue = function () {
+		return getSiteSelectorValue(getQuickReportsSiteSelector());
+	};
+	var getMyTeamFoldersSiteSelectorValue = function () {
+		return getSiteSelectorValue(getMyTeamFoldersSiteSelector());
+	}
+
+	var getGotoLink = function (parentElement) {
+		return parentElement.getElementsByClassName("goToLink")[0];
+	};
+	var getQuickReportsGotoLink = function () {
+		return getGotoLink(getQuickReports());
+	};
+	var getMyFoldersGotoLink = function () {
+		return getGotoLink(getMyFolders());
+	};
+	var getMyTeamFoldersGotoLink = function () {
+		return getGotoLink(getMyTeamFolders());
+	};
+	var getPublicFoldersGotoLink = function () {
+		return getGotoLink(getPublicFolders());
+	};
+
+	var getIFrame = function (parentElement) {
+		return parentElement.getElementsByTagName("iframe")[0];
+	};
+	var getQuickReportsIFrame = function () {
+		return getIFrame(getQuickReports());
+	};
+	var getMyFoldersIFrame = function () {
+		return getIFrame(getMyFolders());
+	};
+	var getMyTeamFoldersIFrame = function () {
+		return getIFrame(getMyTeamFolders());
+	};
+	var getPublicFoldersIFrame = function () {
+		return getIFrame(getPublicFolders());
+	};
+
+	var toggle = function (element, state, type) {
+		element.style.display = state ? type : "none";
+	}
+	var toggleBlock = function (element, state) {
+		toggle(element, state, "block");
+	}
+	var toggleBlockDefault = function (element) {
+		var hidden = element.style.display === "none";
+		toggleBlock(element, hidden);
+	};
+	var toggleInline = function (element, state) {
+		toggle(element, state, "inline-block");
+	}
+	var toggleInlineDefault = function (element) {
+		var hidden = element.style.display === "none";
+		toggleInline(element, hidden);
+	};
+
+
+	return {
+		getQuickReportsUrlsForm: getQuickReportsUrlsForm,
+		getMyTeamFoldersUrlsForm: getMyTeamFoldersUrlsForm,
+
+		getQuickReportsSiteSelector: getQuickReportsSiteSelector,
+		getMyTeamFoldersSiteSelector: getMyTeamFoldersSiteSelector,
+
+		getQuickReportsSiteSelectorValue: getQuickReportsSiteSelectorValue,
+		getMyTeamFoldersSiteSelectorValue: getMyTeamFoldersSiteSelectorValue,
+
+		getQuickReportsGotoLink: getQuickReportsGotoLink,
+		getMyFoldersGotoLink: getMyFoldersGotoLink,
+		getMyTeamFoldersGotoLink: getMyTeamFoldersGotoLink,
+		getPublicFoldersGotoLink: getPublicFoldersGotoLink,
+
+		getQuickReportsIFrame: getQuickReportsIFrame,
+		getMyFoldersIFrame: getMyFoldersIFrame,
+		getMyTeamFoldersIFrame: getMyTeamFoldersIFrame,
+		getPublicFoldersIFrame: getPublicFoldersIFrame,
+
+		toggleBlock: toggleBlock,
+		toggleBlockDefault: toggleBlockDefault,
+		toggleInline: toggleInline,
+		toggleInlineDefault: toggleInlineDefault
+	};
+}());
+
+var storageUtility = (function () {
+	var getCountLabel = function (tag) {
+		return tag + " count";
+	};
+	var getSiteNameLabel = function (tag, index) {
+		return tag + " " + index + " name";
+	};
+	var getSiteUrlLabel = function (tag, index) {
+		return tag + " " + index + " url";
+	};
+
+	var writeLocalStorage = function (tag, sites) {
+		clearLocalStorage(tag);
+
+		localStorage.setItem(getCountLabel(tag), sites.length);
+		for (var i = 0; i < sites.length; i++) {
+			var site = sites[i];
+			var name = site.name;
+			var url = site.url;
+
+			localStorage.setItem(getSiteNameLabel(tag, i), name);
+			localStorage.setItem(getSiteUrlLabel(tag, i), url);
+		}
+	};
+	var readLocalStorage = function (tag) {
+		var countStr = localStorage.getItem(getCountLabel(tag));
+		if (countStr === undefined) {
+			return undefined;
+		}
+		var count = parseInt(countStr);
+
+		var sites = [];
+		for (var i = 0; i < count; i++) {
+			var name = localStorage.getItem(getSiteNameLabel(tag, i));
+			var url = localStorage.getItem(getSiteUrlLabel(tag, i));
+
+			var site = {};
+			site.name = name;
+			site.url = url;
+			sites.push(site);
+		}
+		return sites;
+	};
+	var clearLocalStorage = function (tag) {
+		var countStr = localStorage.getItem(getCountLabel(tag));
+		if (countStr === null) {
+			return;
+		}
+		var count = parseInt(countStr);
+		for (var i = 0; i < count; i++) {
+			localStorage.removeItem(getSiteNameLabel(tag, i));
+			localStorage.removeItem(getSiteUrlLabel(tag, i));
+		}
+		localStorage.removeItem(getCountLabel(tag));
+	};
+
+	return {
+		writeLocalStorage: writeLocalStorage,
+		readLocalStorage: readLocalStorage,
+		clearLocalStorage: clearLocalStorage
+	}
+}());

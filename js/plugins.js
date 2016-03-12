@@ -23,6 +23,96 @@
 
 var UTILS = (function () {
 
+    var isObject = function (o) {
+        var toString = Object.prototype.toString;
+        return (toString.call(o) === toString.call({}));
+    };
+    var addEvent = function (elem, type, handler) {
+        if (elem.addEventListener) {
+            elem.addEventListener(type, handler, false);
+        } else if (elem.attachEvent) {
+            elem.attachEvent("on" + type, handler);
+        } else {
+            elem["on" + type] = handler;
+        }
+    };
+    var removeEvent = function (elem, type, hadler) {
+        if (elem.removeEventListener) {
+            elem.removeEventListener(eventType, handler, false);
+        } else if (elem.detachEvent) {
+            elem.detachEvent("on" + eventType, handler);
+        } else {
+            elem["on" + type] = null;
+        }
+    };
+    var ajax = function (url, options) {
+        var xhr = new XMLHttpRequest(),
+            method = 'GET',
+            options = isObject(options) ? options : {};
+
+        // Check if "method" was supplied
+        if (options.method) {
+            method = options.method;
+        }
+
+        // Setup the request
+        xhr.open(method.toUpperCase(), url);
+
+        xhr.onreadystatechange = function () {
+            var status;
+
+            // If request finished
+            if (xhr.readyState === 4) {
+                status = xhr.status;
+
+                // If response is OK or fetched from cache
+                if ((status >= 200 && status < 300) || status === 304) {
+                    var res = xhr.responseText,
+                        contentType = xhr.getResponseHeader('Content-Type');
+
+                    // If server sent a content type header, handle formats
+                    if (contentType) {
+                        // Handle JSON format
+                        if (contentType === 'text/json' ||
+                            contentType === 'application/json') {
+
+                            // JSON throws an exception on invalid JSON
+                            try {
+                                res = JSON.parse(res);
+                            } catch (err) {
+                                // Trigger "fail" callback if set
+                                if (options.fail) {
+                                    options.fail.call(xhr, err);
+                                    return;
+                                }
+                            }
+                        // Handle XML format
+                        } else if (contentType === 'text/xml' ||
+                            contentType === 'application/xml') {
+                            // responseXML returns a document object
+                            res = xhr.responseXML;
+
+                            // if XML was invalid, trigger fail callback
+                            if (res === null && options.fail) {
+                                options.fail.call(xhr, 'Bad XML file');
+                                return;
+                            }
+                        }
+                    }
+
+                    // Trigger done callback with the proper response
+                    if (options.done) {
+                        options.done.call(xhr, res);
+                    }
+                }
+
+            }
+        };
+
+        // Fire the request
+        xhr.send(null);
+    };
+
     return {
 
         /**
@@ -35,15 +125,7 @@ var UTILS = (function () {
          * @param {function} hadler
          *          the handler that should be notify when the event occurs
          */
-        addEvent: function (elem, type, handler) {
-            if (elem.addEventListener) {
-                elem.addEventListener(type, handler, false);
-            } else if (elem.attachEvent) {
-                elem.attachEvent("on" + type, handler);
-            } else {
-                elem["on" + type] = handler;
-            }
-        },
+        addEvent: addEvent,
 
         /**
          * Remove an event hadler of an element
@@ -55,15 +137,16 @@ var UTILS = (function () {
          * @param {function} hadler
          *          the handler that is listening to the element
          */
-        removeEvent: function (elem, type, hadler) {
-            if (elem.removeEventListener) {
-                elem.removeEventListener(eventType, handler, false);
-            } else if (elem.detachEvent) {
-                elem.detachEvent("on" + eventType, handler);
-            } else {
-                elem["on" + type] = null;
-            }
-        }
+        removeEvent: removeEvent,
+
+        /**
+         * AJAX helper function (similar to jQuery, but far from it!)
+         *
+         * @param {string} url     URL for the ajax request
+         * @param {Object} options AJAX settings
+         */
+        ajax: ajax
 
     };
-});
+
+}());

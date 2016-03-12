@@ -1,28 +1,108 @@
 
 window.onload = function () {
+	initializeListeners();
+
 	// Default '#quick-reports' tab
 	if (document.location.hash == "" || document.location.hash == "#") {
 	    document.location.hash = "#/quick-reports";
 	}
 
-	var urlsFroms = document.getElementsByClassName("urls-from");
-	for (var i = 0; i < urlsFroms.length; i++) {
-		var form = urlsFroms[i];
-	}
-
+	loadNotification();
 	reloadAll();
 
-	var iframe, urlsFrom, loaded;
+	var iframe, urlsForm, loaded;
 
 	iframe = utility.getQuickReportsIFrame();
-	urlsFrom = utility.getQuickReportsUrlsForm();
+	urlsForm = utility.getQuickReportsUrlsForm();
 	loaded = iframe.getAttribute("src") !== ""; 
-	utility.toggleInline(urlsFrom, !loaded);
+	utility.toggleInline(urlsForm, !loaded);
 
 	iframe = utility.getMyTeamFoldersIFrame();
-	urlsFrom = utility.getMyTeamFoldersUrlsForm();
+	urlsForm = utility.getMyTeamFoldersUrlsForm();
 	loaded = iframe.getAttribute("src") !== "";
-	utility.toggleInline(urlsFrom, !loaded);
+	utility.toggleInline(urlsForm, !loaded);
+}
+
+function initializeListeners() {
+	var tabSelectors = utility.getTabSelectors();
+	for (var i = 0; i < tabSelectors.length; i++) {
+		var selector = tabSelectors[i];
+		UTILS.addEvent(selector, "click", tabSelect);
+	}
+
+	var siteSelector;
+	siteSelector = utility.getQuickReportsSiteSelector();
+	UTILS.addEvent(siteSelector, "change", siteChange);
+	siteSelector = utility.getMyTeamFoldersSiteSelector();
+	UTILS.addEvent(siteSelector, "change", siteChange);
+
+	var urlsForm;
+	urlsForm = utility.getQuickReportsUrlsForm();
+	UTILS.addEvent(urlsForm, "submit", submiturlsFormQuickReports);
+	urlsForm = utility.getMyTeamFoldersUrlsForm();
+	UTILS.addEvent(urlsForm, "submit", submiturlsFormMyTeamFolders);
+}
+
+function loadNotification() {
+	utility.getConfig(function (config) {
+		var notifications = utility.getNotifications();
+		if (config.notification) {
+			notifications.innerHTML = config.notification;
+		}
+		utility.toggleBlock(notifications, config.notification);
+
+		var navbar = utility.getNavbar();
+		for (var i = 0; i < config.quickActions.length; i++) {
+			var sectionConfig = config.quickActions[i];
+			var navSection = document.createElement("div");
+			navSection.className = "nav-section";
+			navSection.style.backgroundImage = "url('/Images/icons/" + sectionConfig.icon + ".png')";
+			navbar.appendChild(navSection);
+
+			var label = document.createElement("p");
+			label.innerHTML = sectionConfig.label;;
+			navSection.appendChild(label);
+
+			var menu = document.createElement("div");
+			menu.className = "menu";
+			navSection.appendChild(menu);
+
+			var menuHint = document.createElement("div");
+			menuHint.className = "menu-hint";
+			menu.appendChild(menuHint);
+
+			var actionsLabel = document.createElement("p");
+			actionsLabel.innerHTML = sectionConfig.actionsLabel;
+			menuHint.appendChild(actionsLabel);
+
+			var arrow = document.createElement("div");
+			arrow.className = "arrow";
+			menuHint.appendChild(arrow);
+
+			var actionList = document.createElement("ul");
+			actionList.className = "action-list";
+			menu.appendChild(actionList);
+
+			for (var j = 0; j < sectionConfig.actions.length; j++) {
+				var action = sectionConfig.actions[j];
+				var li = document.createElement("li");
+				actionList.appendChild(li);
+
+				var link = document.createElement("a");
+				link.innerHTML = action.label;
+				link.href = action.url;
+				li.appendChild(link);
+			}
+		}
+
+		var iframe;
+
+		iframe = utility.getMyFoldersIFrame();
+		iframe.setAttribute("src", config.tabsList[1].options.url);
+
+		iframe = utility.getPublicFoldersIFrame();
+		iframe.setAttribute("src", config.tabsList[3].options.url);
+	});
 }
 
 function reloadAll() {
@@ -32,13 +112,13 @@ function reloadAll() {
 }
 
 function reloadForms() {
-	var urlsFrom;
+	var urlsForm;
 
-	urlsFrom = utility.getQuickReportsUrlsForm();
-	loadUrlsFrom("quick-reports", urlsFrom);
+	urlsForm = utility.getQuickReportsUrlsForm();
+	loadurlsForm("quick-reports", urlsForm);
 
-	urlsFrom = utility.getMyTeamFoldersUrlsForm();
-	loadUrlsFrom("my-team-folders", urlsFrom);
+	urlsForm = utility.getMyTeamFoldersUrlsForm();
+	loadurlsForm("my-team-folders", urlsForm);
 }
 
 function reloadToolBars() {
@@ -64,20 +144,20 @@ function siteChange() {
 	currentUrl = iframe.getAttribute("src");
 	if (currentUrl !== url) {
 		iframe.setAttribute("src", url);
-		var urlsFrom = utility.getQuickReportsUrlsForm();
-		utility.toggleInline(urlsFrom, false);
+		var urlsForm = utility.getQuickReportsUrlsForm();
+		utility.toggleInline(urlsForm, url === "");
 	}
-	utility.toggleInline(iframe, url !== "none");
+	utility.toggleInline(iframe, url !== "");
 
 	iframe = utility.getMyTeamFoldersIFrame();
 	url = utility.getMyTeamFoldersSiteSelectorValue();
 	currentUrl = iframe.getAttribute("src");
 	if (currentUrl !== url) {
 		iframe.setAttribute("src", url);
-		var urlsFrom = utility.getMyTeamFoldersUrlsForm();
-		utility.toggleInline(urlsFrom, false);
+		var urlsForm = utility.getMyTeamFoldersUrlsForm();
+		utility.toggleInline(urlsForm, url === "");
 	}
-	utility.toggleInline(iframe, url !== "none");
+	utility.toggleInline(iframe, url !== "");
 
 	reloadGoto();
 }
@@ -105,7 +185,7 @@ function reloadGoto() {
 function reloadGotoLink(link, iframe) {
 	url = iframe.getAttribute("src");
 	link.setAttribute("href", url);
-	utility.toggleInline(link, url !== "none");
+	utility.toggleInline(link, url !== "");
 }
 
 function loadCombobox(tag, combobox) {
@@ -131,7 +211,7 @@ function loadCombobox(tag, combobox) {
 	}
 }
 
-function loadUrlsFrom(tag, form) {
+function loadurlsForm(tag, form) {
 	var subForms = form.getElementsByClassName("url-form");
 
 	// Clear existing text
@@ -162,7 +242,13 @@ function loadUrlsFrom(tag, form) {
 	}
 }
 
-function submitUrlsFrom(event, tag) {
+function submiturlsFormQuickReports(event) {
+	return submiturlsForm(event, "quick-reports");
+}
+function submiturlsFormMyTeamFolders(event) {
+	return submiturlsForm(event, "my-team-folders");
+}
+function submiturlsForm(event, tag) {
 	// Validate
 	var form = event.target;
 	var subForms = form.getElementsByClassName("url-form");
@@ -202,9 +288,12 @@ function submitUrlsFrom(event, tag) {
 		storageUtility.writeLocalStorage(tag, sites);
 		reloadAll();
 	}
+	if (sites.length > 0) {
+		utility.toggleInline(form, false);
+	}
 
 	// Disable page reloading
-	return false;
+	event.preventDefault();
 }
 function isValidName(name) {
 	return name !== "";
@@ -217,12 +306,12 @@ function resetInputBorder(inputElement) {
 }
 
 function quickReportsSetting() {
-	var urlsFrom = utility.getQuickReportsUrlsForm();
-	utility.toggleInlineDefault(urlsFrom);
+	var urlsForm = utility.getQuickReportsUrlsForm();
+	utility.toggleInlineDefault(urlsForm);
 }
 function teamFoldersSetting() {
-	var urlsFrom = utility.getMyTeamFoldersUrlsForm();
-	utility.toggleInlineDefault(urlsFrom);
+	var urlsForm = utility.getMyTeamFoldersUrlsForm();
+	utility.toggleInlineDefault(urlsForm);
 }
 
 function tabSelect(e) {
@@ -232,9 +321,7 @@ function tabSelect(e) {
 
 function reloadSelectedTab() {
 	var currentHash = document.location.hash;
-	var tabs = document.getElementsByClassName("tabs")[0];
-    var tabsSelectorsList = tabs.getElementsByTagName("ul")[0];
-    var allTabs = tabsSelectorsList.getElementsByTagName("a");
+    var allTabs = utility.getTabSelectors();
 
     for (var i = 0; i < allTabs.length; i++) {
     	var tab = allTabs[i];
@@ -243,7 +330,7 @@ function reloadSelectedTab() {
     	tab.style.backgroundColor = isCurrentTab ? "#EBEBEB" : "#646464";
     }
 
-    tabs = document.getElementsByClassName("tab");
+    var tabs = document.getElementsByClassName("tab");
     for (var i = 0; i < tabs.length; i++) {
     	var tab = tabs[i];
     	var selected = ("#/" + tab.id) === currentHash;
@@ -254,6 +341,28 @@ function reloadSelectedTab() {
 /* -------------------- Utilities -------------------- */
 
 var utility = (function() {
+	var getConfig = function (success) {
+		UTILS.ajax("data/config.json", {
+			method: "GET",
+			done: function (res) {
+				success.call(this, JSON.parse(res));
+			}
+		});
+	};
+
+	var getNotifications = function () {
+		return document.getElementsByClassName("notifications")[0];
+	}
+	var getNavbar = function () {
+		return document.getElementsByTagName("nav")[0];
+	}
+
+	var getTabSelectors = function () {
+		var tabs = document.getElementsByClassName("tabs")[0];
+    	var tabsSelectorsList = tabs.getElementsByTagName("ul")[0];
+    	return tabsSelectorsList.getElementsByTagName("a");
+	};
+
 	var getQuickReports = function () {
 		return document.getElementById("quick-reports");
 	};
@@ -268,7 +377,7 @@ var utility = (function() {
 	};
 
 	var getUrlsForm = function (parentElement) {
-		return parentElement.getElementsByClassName("urls-from")[0];
+		return parentElement.getElementsByClassName("urls-form")[0];
 	};
 	var getQuickReportsUrlsForm = function () {
 		return getUrlsForm(getQuickReports());
@@ -278,7 +387,7 @@ var utility = (function() {
 	};
 
 	var getSiteSelector = function (parentElement) {
-		return parentElement.getElementsByTagName("select")[0];
+		return parentElement.getElementsByClassName("siteSelector")[0];
 	}
 	var getQuickReportsSiteSelector = function () {
 		return getSiteSelector(getQuickReports());
@@ -352,8 +461,14 @@ var utility = (function() {
 		toggleInline(element, hidden);
 	};
 
-
 	return {
+
+		getConfig: getConfig,
+		getNotifications: getNotifications,
+		getNavbar: getNavbar,
+
+		getTabSelectors: getTabSelectors,
+
 		getQuickReportsUrlsForm: getQuickReportsUrlsForm,
 		getMyTeamFoldersUrlsForm: getMyTeamFoldersUrlsForm,
 
@@ -381,24 +496,50 @@ var utility = (function() {
 }());
 
 var storageUtility = (function () {
-	var writeLocalStorage = function (tag, sites) {
-		if (tag === undefined || sites === undefined) {
+	var dataTag = "WebAppData";
+	var read = function () {
+		var dataStr = localStorage.getItem(dataTag);
+		if (dataStr === undefined || dataStr === null) {
+			return undefined;
+		}
+		var data = JSON.parse(dataStr);
+		if (data === undefined || data === null) {
+			return undefined;
+		}
+		return data;
+	};
+	var write = function (data) {
+		if (data === undefined || data === null) {
 			return;
 		}
-		var sitesStr = JSON.stringify(sites);
-		localStorage.setItem(tag, sitesStr);
+		var dataStr = JSON.stringify(data);
+		if (dataStr === undefined || dataStr === null) {
+			return;
+		}
+		localStorage.setItem(dataTag, dataStr);
+	};
+
+	var writeLocalStorage = function (tag, sites) {
+		if (sites === undefined) {
+			return;
+		}
+		
+		var data = read();
+		if (data === undefined) {
+			data = {};
+		}
+		data[tag] = sites;
+
+		write(data);
 	};
 	var readLocalStorage = function (tag) {
-		var sitesStr = localStorage.getItem(tag);
-		if (sitesStr === undefined) {
+		var data = read();
+		if (data === undefined) {
 			return undefined;
 		}
-		var sitesStr = JSON.parse(sitesStr);
-		if (sitesStr === undefined || sitesStr === null) {
-			return undefined;
-		}
-		return sitesStr;
-	}
+		return data[tag];
+	};
+
 
 	return {
 		writeLocalStorage: writeLocalStorage,

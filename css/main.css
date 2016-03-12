@@ -181,6 +181,15 @@ header .search-box {
     padding-bottom: 0;
 }
 
+.notifications {
+    display: block;
+    font-size: 0.85em;
+    padding: 0.4rem;
+    padding-left: 0.6rem;
+    background-color: #EBEBEB;
+    margin-bottom: 0.5rem;
+}
+
 nav {
     margin-bottom: 1em;
     height: 10em;
@@ -213,18 +222,6 @@ nav {
     background-color: #252525;
 }
 
-#nav-1th-section {
-    background-image: url('../Images/icons/action-report-new.png');
-}
-
-#nav-2th-section {
-    background-image: url('../Images/icons/action-report-top.png');
-}
-
-#nav-3th-section {
-    background-image: url('../Images/icons/actions-help.png');
-}
-
 .nav-section > p {
     width: 100%;
     text-align: center;
@@ -240,6 +237,22 @@ nav {
 
 .menu-hint {
     height: 2.5em;
+    position: relative;
+}
+
+.menu-hint .arrow {
+    display: inline-block;
+    position: absolute;
+    right: 0.5em;
+    top: calc(50% - 0.3em);
+    width: 0;
+    border: 0.6em solid transparent;
+    border-top: 0.6em solid black;
+    transform-origin: 50% 10%;
+    transition: transform 0.5s ease;
+}
+.nav-section:hover .arrow {
+    transform: rotate(180deg);
 }
 
 .menu-hint > p {
@@ -352,7 +365,7 @@ nav {
     margin-right: 0.5rem;
 }
 
-.urls-from {
+.urls-form {
     box-sizing: border-box;
     width: 100%;
     padding: 0.75em;
@@ -362,11 +375,11 @@ nav {
     left: 0;
 }
 
-.urls-from .url-from:first-child {
+.urls-form .url-form:first-child {
     margin-top: 0;
 }
 
-.urls-from .url-from:last-child {
+.urls-form .url-form:last-child {
     margin-bottom: 0;
 }
 
@@ -412,7 +425,7 @@ nav {
     width: calc(100% - 6em);
 }
 
-.urls-from input[type='submit'] {
+.urls-form input[type='submit'] {
     float: right;
     margin-top: 0.75em;
 }

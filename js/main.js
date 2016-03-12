@@ -41,6 +41,12 @@ function initializeListeners() {
 	UTILS.addEvent(urlsForm, "submit", submiturlsFormQuickReports);
 	urlsForm = utility.getMyTeamFoldersUrlsForm();
 	UTILS.addEvent(urlsForm, "submit", submiturlsFormMyTeamFolders);
+
+	var settingButton;
+	settingButton = utility.getQuickReportsSettingButton();
+	UTILS.addEvent(settingButton, "click", quickReportsSetting);
+	settingButton = utility.getMyTeamFoldersSettingButton();
+	UTILS.addEvent(settingButton, "click", teamFoldersSetting);
 }
 
 function loadNotification() {
@@ -56,7 +62,7 @@ function loadNotification() {
 			var sectionConfig = config.quickActions[i];
 			var navSection = document.createElement("div");
 			navSection.className = "nav-section";
-			navSection.style.backgroundImage = "url('/Images/icons/" + sectionConfig.icon + ".png')";
+			navSection.style.backgroundImage = "url('./Images/icons/" + sectionConfig.icon + ".png')";
 			navbar.appendChild(navSection);
 
 			var label = document.createElement("p");
@@ -79,9 +85,13 @@ function loadNotification() {
 			arrow.className = "arrow";
 			menuHint.appendChild(arrow);
 
+			var actionListWrapper = document.createElement("div");
+			actionListWrapper.className = "action-list-wrapper";
+			menu.appendChild(actionListWrapper);
+
 			var actionList = document.createElement("ul");
 			actionList.className = "action-list";
-			menu.appendChild(actionList);
+			actionListWrapper.appendChild(actionList);
 
 			for (var j = 0; j < sectionConfig.actions.length; j++) {
 				var action = sectionConfig.actions[j];
@@ -342,10 +352,13 @@ function reloadSelectedTab() {
 
 var utility = (function() {
 	var getConfig = function (success) {
-		UTILS.ajax("data/config.json", {
+		UTILS.ajax("./data/config.json", {
 			method: "GET",
 			done: function (res) {
-				success.call(this, JSON.parse(res));
+				if (!UTILS.isObject(res)) {
+					res = JSON.parse(res);
+				}
+				success.call(this, res);
 			}
 		});
 	};
@@ -410,6 +423,16 @@ var utility = (function() {
 	var getMyTeamFoldersSiteSelectorValue = function () {
 		return getSiteSelectorValue(getMyTeamFoldersSiteSelector());
 	}
+
+	var getSettingButton = function (parentElement) {
+		return parentElement.getElementsByClassName("settingLink")[0];
+	};
+	var getQuickReportsSettingButton = function () {
+		return getSettingButton(getQuickReports());
+	};
+	var getMyTeamFoldersSettingButton = function () {
+		return getSettingButton(getMyTeamFolders());
+	};
 
 	var getGotoLink = function (parentElement) {
 		return parentElement.getElementsByClassName("goToLink")[0];
@@ -477,6 +500,9 @@ var utility = (function() {
 
 		getQuickReportsSiteSelectorValue: getQuickReportsSiteSelectorValue,
 		getMyTeamFoldersSiteSelectorValue: getMyTeamFoldersSiteSelectorValue,
+
+		getQuickReportsSettingButton: getQuickReportsSettingButton,
+		getMyTeamFoldersSettingButton: getMyTeamFoldersSettingButton,
 
 		getQuickReportsGotoLink: getQuickReportsGotoLink,
 		getMyFoldersGotoLink: getMyFoldersGotoLink,

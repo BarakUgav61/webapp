@@ -116,6 +116,14 @@ var UTILS = (function () {
     return {
 
         /**
+         * Check if a given value is a plain Object
+         *
+         * @param  {*}       o Any value to be checked
+         * @return {Boolean}   true if it's an Object
+         */
+        isObject: isObject,
+
+        /**
          * Add an event hadler to an element
          * 
          * @param {EventTarget} elem

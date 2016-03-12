@@ -12,9 +12,16 @@ window.onload = function () {
 
 	reloadAll();
 
-	var iframe = utility.getQuickReportsIFrame();
-	var loaded = iframe.getAttribute("src") !== "";
-	var urlsFrom = utility.getQuickReportsUrlsForm();
+	var iframe, urlsFrom, loaded;
+
+	iframe = utility.getQuickReportsIFrame();
+	urlsFrom = utility.getQuickReportsUrlsForm();
+	loaded = iframe.getAttribute("src") !== ""; 
+	utility.toggleInline(urlsFrom, !loaded);
+
+	iframe = utility.getMyTeamFoldersIFrame();
+	urlsFrom = utility.getMyTeamFoldersUrlsForm();
+	loaded = iframe.getAttribute("src") !== "";
 	utility.toggleInline(urlsFrom, !loaded);
 }
 
@@ -25,7 +32,9 @@ function reloadAll() {
 }
 
 function reloadForms() {
-	var urlsFrom = utility.getQuickReportsUrlsForm();
+	var urlsFrom;
+
+	urlsFrom = utility.getQuickReportsUrlsForm();
 	loadUrlsFrom("quick-reports", urlsFrom);
 
 	urlsFrom = utility.getMyTeamFoldersUrlsForm();
@@ -38,11 +47,13 @@ function reloadToolBars() {
 }
 
 function reloadComboboxes() {
-	var combobox = utility.getQuickReportsSiteSelector();
-	loadCombobox("quick-reports", combobox);
+	var selector;
 
-	combobox = utility.getMyTeamFoldersSiteSelector();
-	loadCombobox("my-team-folders", combobox);
+	selector = utility.getQuickReportsSiteSelector();
+	loadCombobox("quick-reports", selector);
+
+	selector = utility.getMyTeamFoldersSiteSelector();
+	loadCombobox("my-team-folders", selector);
 }
 
 function siteChange() {
@@ -106,13 +117,10 @@ function loadCombobox(tag, combobox) {
 
 	// Read from local storage
 	var sites = storageUtility.readLocalStorage(tag);
-	if (sites === undefined) {
-		return;
-	} else if (!(sites.length > 0)) {
+	if (sites === undefined || sites.length === 0) {
 		return;
 	}
 
-	// Length > 0
 	combobox.style.display = "inline-block";
 	for (var i = 0; i < sites.length; i++) {
 		var site = sites[i];
@@ -230,13 +238,9 @@ function reloadSelectedTab() {
 
     for (var i = 0; i < allTabs.length; i++) {
     	var tab = allTabs[i];
-    	if (tab.hash === currentHash) {
-    		tab.style.backgroundColor = "#EBEBEB";
-    		tab.style.color = "black";
-    	} else {
-    		tab.style.backgroundColor = "#646464";
-    		tab.style.color = "white";
-    	}
+    	var isCurrentTab = tab.hash === currentHash;
+    	tab.style.color = isCurrentTab ? "black" : "white";
+    	tab.style.backgroundColor = isCurrentTab ? "#EBEBEB" : "#646464";
     }
 
     tabs = document.getElementsByClassName("tab");
@@ -377,64 +381,27 @@ var utility = (function() {
 }());
 
 var storageUtility = (function () {
-	var getCountLabel = function (tag) {
-		return tag + " count";
-	};
-	var getSiteNameLabel = function (tag, index) {
-		return tag + " " + index + " name";
-	};
-	var getSiteUrlLabel = function (tag, index) {
-		return tag + " " + index + " url";
-	};
-
 	var writeLocalStorage = function (tag, sites) {
-		clearLocalStorage(tag);
-
-		localStorage.setItem(getCountLabel(tag), sites.length);
-		for (var i = 0; i < sites.length; i++) {
-			var site = sites[i];
-			var name = site.name;
-			var url = site.url;
-
-			localStorage.setItem(getSiteNameLabel(tag, i), name);
-			localStorage.setItem(getSiteUrlLabel(tag, i), url);
-		}
-	};
-	var readLocalStorage = function (tag) {
-		var countStr = localStorage.getItem(getCountLabel(tag));
-		if (countStr === undefined) {
-			return undefined;
-		}
-		var count = parseInt(countStr);
-
-		var sites = [];
-		for (var i = 0; i < count; i++) {
-			var name = localStorage.getItem(getSiteNameLabel(tag, i));
-			var url = localStorage.getItem(getSiteUrlLabel(tag, i));
-
-			var site = {};
-			site.name = name;
-			site.url = url;
-			sites.push(site);
-		}
-		return sites;
-	};
-	var clearLocalStorage = function (tag) {
-		var countStr = localStorage.getItem(getCountLabel(tag));
-		if (countStr === null) {
+		if (tag === undefined || sites === undefined) {
 			return;
 		}
-		var count = parseInt(countStr);
-		for (var i = 0; i < count; i++) {
-			localStorage.removeItem(getSiteNameLabel(tag, i));
-			localStorage.removeItem(getSiteUrlLabel(tag, i));
-		}
-		localStorage.removeItem(getCountLabel(tag));
+		var sitesStr = JSON.stringify(sites);
+		localStorage.setItem(tag, sitesStr);
 	};
+	var readLocalStorage = function (tag) {
+		var sitesStr = localStorage.getItem(tag);
+		if (sitesStr === undefined) {
+			return undefined;
+		}
+		var sitesStr = JSON.parse(sitesStr);
+		if (sitesStr === undefined || sitesStr === null) {
+			return undefined;
+		}
+		return sitesStr;
+	}
 
 	return {
 		writeLocalStorage: writeLocalStorage,
-		readLocalStorage: readLocalStorage,
-		clearLocalStorage: clearLocalStorage
+		readLocalStorage: readLocalStorage
 	}
 }());

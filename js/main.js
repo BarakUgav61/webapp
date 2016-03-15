@@ -85,13 +85,9 @@ function loadNotification() {
 			arrow.className = "arrow";
 			menuHint.appendChild(arrow);
 
-			var actionListWrapper = document.createElement("div");
-			actionListWrapper.className = "action-list-wrapper";
-			menu.appendChild(actionListWrapper);
-
 			var actionList = document.createElement("ul");
 			actionList.className = "action-list";
-			actionListWrapper.appendChild(actionList);
+			menuHint.appendChild(actionList);
 
 			for (var j = 0; j < sectionConfig.actions.length; j++) {
 				var action = sectionConfig.actions[j];
@@ -356,6 +352,7 @@ var utility = (function() {
 			method: "GET",
 			done: function (res) {
 				if (!UTILS.isObject(res)) {
+					// If and only if not parsed yet, parse
 					res = JSON.parse(res);
 				}
 				success.call(this, res);

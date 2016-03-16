@@ -36,11 +36,15 @@ function initializeListeners() {
 	siteSelector = utility.getMyTeamFoldersSiteSelector();
 	UTILS.addEvent(siteSelector, "change", siteChange);
 
-	var urlsForm;
+	var urlsForm, submitButton;
 	urlsForm = utility.getQuickReportsUrlsForm();
+	submitButton = utility.getSubmitButton(urlsForm);
 	UTILS.addEvent(urlsForm, "submit", submiturlsFormQuickReports);
+	UTILS.addEvent(submitButton, "click", submiturlsFormQuickReports);
 	urlsForm = utility.getMyTeamFoldersUrlsForm();
+	submitButton = utility.getSubmitButton(urlsForm);
 	UTILS.addEvent(urlsForm, "submit", submiturlsFormMyTeamFolders);
+	UTILS.addEvent(submitButton, "click", submiturlsFormMyTeamFolders);
 
 	var settingButton;
 	settingButton = utility.getQuickReportsSettingButton();
@@ -249,14 +253,15 @@ function loadurlsForm(tag, form) {
 }
 
 function submiturlsFormQuickReports(event) {
-	return submiturlsForm(event, "quick-reports");
+	var form = utility.getQuickReportsUrlsForm();
+	return submiturlsForm(event, form, "quick-reports");
 }
 function submiturlsFormMyTeamFolders(event) {
-	return submiturlsForm(event, "my-team-folders");
+	var form = utility.getMyTeamFoldersUrlsForm();
+	return submiturlsForm(event, form, "my-team-folders");
 }
-function submiturlsForm(event, tag) {
+function submiturlsForm(event, form, tag) {
 	// Validate
-	var form = event.target;
 	var subForms = form.getElementsByClassName("url-form");
 	var allValid = true;
 	var sites = [];
@@ -269,16 +274,20 @@ function submiturlsForm(event, tag) {
 
 		resetInputBorder(nameBox);
 		resetInputBorder(urlBox);
-		if (name === "" && url === "") {
+
+		var required = name !== "" || url !== "";
+		nameBox.required = required;
+		urlBox.required = required;
+		if (!required) {
 			continue;
 		}
 
-		if (isValidName(name) !== true) {
+		if (!nameBox.checkValidity()) {
 			nameBox.style.border = "solid 1px red";
 			allValid = false;
 		}
 
-		if (isValidUrl(url) !== true) {
+		if (!urlBox.checkValidity()) {
 			urlBox.style.border = "solid 1px red";
 			allValid = false;
 		}
@@ -290,22 +299,20 @@ function submiturlsForm(event, tag) {
 		sites.push(site);
 	}
 
-	if (allValid === true) {
-		storageUtility.writeLocalStorage(tag, sites);
-		reloadAll();
-	}
-	if (sites.length > 0) {
+	if (allValid && sites.length > 0) {
 		utility.toggleInline(form, false);
 	}
+	if (allValid) {
+		storageUtility.writeLocalStorage(tag, sites);
+		reloadAll();
+	} else {
+		// Not valid, invoke from.submit() for pop ups
+		var submitButton = utility.getSubmitButtonHidden(form);
+		submitButton.click();
+	}
 
-	// Disable page reloading
 	event.preventDefault();
-}
-function isValidName(name) {
-	return name !== "";
-}
-function isValidUrl(url) {
-	return url !== "";
+	return false;
 }
 function resetInputBorder(inputElement) {
 	inputElement.style.border = "2px inset";
@@ -463,6 +470,13 @@ var utility = (function() {
 		return getIFrame(getPublicFolders());
 	};
 
+	var getSubmitButton = function (parentElement) {
+		return parentElement.getElementsByClassName("submit")[0];
+	}
+	var getSubmitButtonHidden = function (parentElement) {
+		return parentElement.getElementsByClassName("hidden-submit")[0];
+	}
+
 	var toggle = function (element, state, type) {
 		element.style.display = state ? type : "none";
 	}
@@ -510,6 +524,9 @@ var utility = (function() {
 		getMyFoldersIFrame: getMyFoldersIFrame,
 		getMyTeamFoldersIFrame: getMyTeamFoldersIFrame,
 		getPublicFoldersIFrame: getPublicFoldersIFrame,
+
+		getSubmitButton: getSubmitButton,
+		getSubmitButtonHidden: getSubmitButtonHidden,
 
 		toggleBlock: toggleBlock,
 		toggleBlockDefault: toggleBlockDefault,

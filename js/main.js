@@ -360,6 +360,7 @@ function reloadSelectedTab() {
 }
 
 function search(event) {
+	event.preventDefault();
 	var enterKeyCode = 13;
 	if (event.keyCode == 13) {
 		var searchBox = utility.getSearchBox();

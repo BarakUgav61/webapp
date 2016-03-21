@@ -428,7 +428,7 @@ nav {
     position: relative;
 }
 
-.text-box span {
+.text-box label {
     width: 5em;
     margin-right: 1em;
 }

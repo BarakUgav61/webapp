@@ -18,9 +18,10 @@
     <body>
         <header>
 			<div class="layout-wrap">
-				<a href="#" class="logo u-hide-text">netcraft<img src="https://googledrive.com/host/0B6ZIsommzsgVMVA2MzdKUjN2S0U/logo-netcraft.svg" alt="netcraft"></a>
+				<a href="#" class="logo u-hide-text">netcraft<img src="https://googledrive.com/host/0B6ZIsommzsgVMVA2MzdKUjN2S0U/logo-netcraft.svg" alt="netcraft logo"></a>
 
-			    <input type="search" placeholder="search" class="search-box">
+				<label for="search" class="u-hide-text">Search:</label>
+			    <input type="search" placeholder="search" class="search-box" id="search">
 			</div>
 		</header>
 
@@ -61,7 +62,8 @@
 
 		        <div class="tab" id="quick-reports">
 		        	<div class="toolbar">
-		        		<select class="siteSelector">
+		        	<label for="quick-reports-site-selector" class="u-hide-text">Select Site:</label>
+		        		<select class="siteSelector" id="quick-reports-site-selector">
 		        		</select>
 
 		        		<a class="u-plain-link settingLink">Setting</a>
@@ -72,21 +74,21 @@
 			        	<form class="urls-form u-clear-fix" action="">
 			        		<div class="url-form">
 			        			<span>Report 01</span>
-			        			<div class="text-box"><span>Name</span><input type="text" class="name"></div>
-			        			<div class="text-box"><span>URL</span><input type="url" class="url"></div>
+			        			<div class="text-box"><label for="report1-name">Name</label><input type="text" class="name" id="report1-name"></div>
+			        			<div class="text-box"><label for="report1-url">URL</label><input type="url" class="url" id="report1-url"></div>
 			        		</div>
 			        		<div class="url-form">
 			        			<span>Report 02</span>
-			        			<div class="text-box"><span>Name</span><input type="text" class="name"></div>
-			        			<div class="text-box"><span>URL</span><input type="url" class="url"></div>
+			        			<div class="text-box"><label for="report2-name">Name</label><input type="text" class="name" id="report2-name"></div>
+			        			<div class="text-box"><label for="report2-url">URL</label><input type="url" class="url" id="report2-url"></div>
 			        		</div>
 			        		<div class="url-form">
 			        			<span>Report 03</span>
-			        			<div class="text-box"><span>Name</span><input type="text" class="name"></div>
-			        			<div class="text-box"><span>URL</span><input type="url" class="url"></div>
+			        			<div class="text-box"><label for="report3-name">Name</label><input type="text" class="name" id="report3-name"></div>
+			        			<div class="text-box"><label for="report3-url">URL</label><input type="url" class="url" id="report3-url"></div>
 			        		</div>
 			        		<input type="submit" value="save" class="submit">
-			        		<input type="submit" class="hidden hidden-submit">
+			        		<input type="submit" class="hidden hidden-submit" value="submit">
 			        	</form>
 
 			        	<iframe src="" frameborder="0"></iframe>
@@ -104,7 +106,8 @@
 
 		        <div class="tab" id="my-team-folders">
 		        	<div class="toolbar">
-		        		<select class="siteSelector">
+		        		<label for="my-team-folder-site-selector" class="u-hide-text">Select Site:</label>
+		        		<select class="siteSelector" id="my-team-folder-site-selector">
 		        		</select>
 
 		        		<a class="u-plain-link settingLink">Setting</a>
@@ -115,21 +118,21 @@
 			        	<form class="urls-form u-clear-fix">
 			        		<div class="url-form">
 			        			<span>Folder 01</span>
-			        			<div class="text-box"><span>Name</span><input type="text" class="name"></div>
-			        			<div class="text-box"><span>URL</span><input type="url" class="url"></div>
+			        			<div class="text-box"><label for="folder1-name">Name</label><input type="text" class="name" id="folder1-name"></div>
+			        			<div class="text-box"><label for="folder1-url">URL</label><input type="url" class="url" id="folder1-url"></div>
 			        		</div>
 			        		<div class="url-form">
 			        			<span>Folder 02</span>
-			        			<div class="text-box"><span>Name</span><input type="text" class="name"></div>
-			        			<div class="text-box"><span>URL</span><input type="url" class="url"></div>
+			        			<div class="text-box"><label for="folder2-name">Name</label><input type="text" class="name" id="folder2-name"></div>
+			        			<div class="text-box"><label for="folder2-url">URL</label><input type="url" class="url" id="folder2-url"></div>
 			        		</div>
 			        		<div class="url-form">
 			        			<span>Folder 03</span>
-			        			<div class="text-box"><span>Name</span><input type="text" class="name"></div>
-			        			<div class="text-box"><span>URL</span><input type="url" class="url"></div>
+			        			<div class="text-box"><label for="folder3-name">Name</label><input type="text" class="name" id="folder3-name"></div>
+			        			<div class="text-box"><label for="folder3-url">URL</label><input type="url" class="url" id="folder3-url"></div>
 			        		</div>
 			        		<input type="submit" value="save" class="submit">
-			        		<input type="submit" class="hidden hidden-submit">
+			        		<input type="submit" class="hidden hidden-submit" value="submit">
 			        	</form>
 
 			        	<iframe src="" frameborder="0"></iframe>

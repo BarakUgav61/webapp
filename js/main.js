@@ -320,6 +320,7 @@ function submiturlsForm(event, form, tag) {
 	}
 
 	event.preventDefault();
+	loadurlsForm();
 	return false;
 }
 function resetInputBorder(inputElement) {

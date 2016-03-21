@@ -323,11 +323,16 @@ nav {
     margin-right: 0;
 }
 
-.tabs > ul > li a {
+.tabs > ul > li > a {
     display: inline-block;
     width: 100%;
     color: white;
     line-height: 2em;
+}
+
+.tabs > ul > li > a > i {
+    display: inline-block;
+    margin-right: 0.2em;
 }
 
 .tab {

@@ -11,6 +11,7 @@
         <!-- Place favicon.ico in the root directory -->
 
         <link rel="stylesheet" href="css/normalize.css">
+        <link rel="stylesheet" href="fonts/style.css">
         <link rel="stylesheet" href="css/main.css">
         <script src="js/vendor/modernizr-2.8.3.min.js"></script>
     </head>
@@ -19,9 +20,7 @@
 			<div class="layout-wrap">
 				<a href="#" class="logo u-hide-text">netcraft<img src="https://googledrive.com/host/0B6ZIsommzsgVMVA2MzdKUjN2S0U/logo-netcraft.svg" alt="netcraft"></a>
 
-			    <form class="search-box" method="get" action="http://www.google.com">
-			        <input type="search" name="q" placeholder="search">
-			    </form>
+			    <input type="search" placeholder="search" class="search-box">
 			</div>
 		</header>
 
@@ -50,13 +49,13 @@
 
 		    <div class="tabs u-clear-float u-clear-fix">
 		        <ul class="u-clear-fix">
-		            <li><a href="#/quick-reports" class="u-plain-link">Quick Reports</a>
+		            <li><a href="#/quick-reports" class="u-plain-link"><i class="icon-external-link"></i>Quick Reports</a>
 		            </li>
-		            <li><a href="#/fmy-folders" class="u-plain-link">My Folders</a>
+		            <li><a href="#/fmy-folders" class="u-plain-link"><i class="icon-star-o"></i>My Folders</a>
 		            </li>
-		            <li><a href="#/my-team-folders" class="u-plain-link">My Team Folders</a>
+		            <li><a href="#/my-team-folders" class="u-plain-link"><i class="icon-folder-open-o"></i>My Team Folders</a>
 		            </li>
-		            <li><a href="#/public-folders" class="u-plain-link">Public Folders</a>
+		            <li><a href="#/public-folders" class="u-plain-link"><i class="icon-copy"></i>Public Folders</a>
 		            </li>
 		        </ul>
 
@@ -66,7 +65,7 @@
 		        		</select>
 
 		        		<a class="u-plain-link settingLink">Setting</a>
-		        		<a class="u-plain-link goToLink">GoTo Site</a>
+		        		<a class="u-plain-link goToLink" target="_blank">GoTo Site</a>
 		        	</div>
 	
 					<div class="tab-body">
@@ -96,7 +95,7 @@
 
 		        <div class="tab" id="fmy-folders">
 		        	<div class="toolbar">
-		        		<a class="u-plain-link goToLink">GoTo Site</a>
+		        		<a class="u-plain-link goToLink" target="_blank">GoTo Site</a>
 		        	</div>
 		        	<div class="tab-body">
 		        		<iframe src="" frameborder="0"></iframe>
@@ -109,7 +108,7 @@
 		        		</select>
 
 		        		<a class="u-plain-link settingLink">Setting</a>
-		        		<a class="u-plain-link goToLink">GoTo Site</a>
+		        		<a class="u-plain-link goToLink" target="_blank">GoTo Site</a>
 		        	</div>
 	
 					<div class="tab-body">
@@ -139,7 +138,7 @@
 
 		        <div class="tab" id="public-folders">
 		        	<div class="toolbar">
-		        		<a class="u-plain-link goToLink">GoTo Site</a>
+		        		<a class="u-plain-link goToLink" target="_blank">GoTo Site</a>
 		        	</div>
 		        	<div class="tab-body">
 		        		<iframe src="" frameborder="0"></iframe>

@@ -7,23 +7,28 @@ window.onload = function () {
 	    document.location.hash = "#/quick-reports";
 	}
 
-	loadNotification();
-	reloadAll();
+	// Load the configuration and then reload all
+	loadConfiguration(function () {
+		reloadAll();
 
-	var iframe, urlsForm, loaded;
+		var iframe, urlsForm, loaded;
 
-	iframe = utility.getQuickReportsIFrame();
-	urlsForm = utility.getQuickReportsUrlsForm();
-	loaded = iframe.getAttribute("src") !== ""; 
-	utility.toggleInline(urlsForm, !loaded);
+		iframe = utility.getQuickReportsIFrame();
+		urlsForm = utility.getQuickReportsUrlsForm();
+		loaded = iframe.getAttribute("src") !== ""; 
+		utility.toggleInline(urlsForm, !loaded);
 
-	iframe = utility.getMyTeamFoldersIFrame();
-	urlsForm = utility.getMyTeamFoldersUrlsForm();
-	loaded = iframe.getAttribute("src") !== "";
-	utility.toggleInline(urlsForm, !loaded);
+		iframe = utility.getMyTeamFoldersIFrame();
+		urlsForm = utility.getMyTeamFoldersUrlsForm();
+		loaded = iframe.getAttribute("src") !== "";
+		utility.toggleInline(urlsForm, !loaded);
+	});
 }
 
 function initializeListeners() {
+	var searchBox = utility.getSearchBox();
+	UTILS.addEvent(searchBox, "keypress", search);
+
 	var tabSelectors = utility.getTabSelectors();
 	for (var i = 0; i < tabSelectors.length; i++) {
 		var selector = tabSelectors[i];
@@ -53,7 +58,7 @@ function initializeListeners() {
 	UTILS.addEvent(settingButton, "click", teamFoldersSetting);
 }
 
-function loadNotification() {
+function loadConfiguration(callBack) {
 	utility.getConfig(function (config) {
 		var notifications = utility.getNotifications();
 		if (config.notification) {
@@ -112,6 +117,9 @@ function loadNotification() {
 
 		iframe = utility.getPublicFoldersIFrame();
 		iframe.setAttribute("src", config.tabsList[3].options.url);
+
+		// Call the call back function
+		callBack();
 	});
 }
 
@@ -351,9 +359,54 @@ function reloadSelectedTab() {
     }
 }
 
+function search(event) {
+	var enterKeyCode = 13;
+	if (event.keyCode == 13) {
+		var searchBox = utility.getSearchBox();
+		var text = searchBox.value;
+
+		var siteSelector, success;
+		siteSelector = utility.getQuickReportsSiteSelector();
+		success = searchInSiteSelector(text, siteSelector, "Quick Reports");
+		if (success) return;
+
+		siteSelector = utility.getMyTeamFoldersSiteSelector();
+		success = searchInSiteSelector(text, siteSelector, "My Team Folders");
+		if (success) return;
+
+		// Didn't find - notify the user
+		window.alert("Match was not found for '" + text + "'");
+	}
+}
+
+function searchInSiteSelector(text, siteSelector, tabName) {
+	for (var i = 0; i < siteSelector.options.length; i++) {
+		var optionStr = siteSelector.options[i].text;
+		if (optionStr.search(text) >= 0) {
+			// Match found
+			siteSelector.selectedIndex = i;
+			siteChange();
+
+			var tabSelectors = utility.getTabSelectors();
+			for (var i = 0; i < tabSelectors.length; i++) {
+				var selector = tabSelectors[i];
+				if (selector.text == tabName) {
+					selector.click();
+				}
+			}
+			return true;
+		}
+	}
+	return false;
+}
+
 /* -------------------- Utilities -------------------- */
 
 var utility = (function() {
+	var getSearchBox = function () {
+		return document.getElementsByClassName("search-box")[0];
+	};
+
 	var getConfig = function (success) {
 		UTILS.ajax("./data/config.json", {
 			method: "GET",
@@ -369,10 +422,10 @@ var utility = (function() {
 
 	var getNotifications = function () {
 		return document.getElementsByClassName("notifications")[0];
-	}
+	};
 	var getNavbar = function () {
 		return document.getElementsByTagName("nav")[0];
-	}
+	};
 
 	var getTabSelectors = function () {
 		var tabs = document.getElementsByClassName("tabs")[0];
@@ -405,7 +458,7 @@ var utility = (function() {
 
 	var getSiteSelector = function (parentElement) {
 		return parentElement.getElementsByClassName("siteSelector")[0];
-	}
+	};
 	var getQuickReportsSiteSelector = function () {
 		return getSiteSelector(getQuickReports());
 	};
@@ -420,13 +473,13 @@ var utility = (function() {
 		} else {
 			return "";
 		}
-	}
+	};
 	var getQuickReportsSiteSelectorValue = function () {
 		return getSiteSelectorValue(getQuickReportsSiteSelector());
 	};
 	var getMyTeamFoldersSiteSelectorValue = function () {
 		return getSiteSelectorValue(getMyTeamFoldersSiteSelector());
-	}
+	};
 
 	var getSettingButton = function (parentElement) {
 		return parentElement.getElementsByClassName("settingLink")[0];
@@ -472,30 +525,32 @@ var utility = (function() {
 
 	var getSubmitButton = function (parentElement) {
 		return parentElement.getElementsByClassName("submit")[0];
-	}
+	};
 	var getSubmitButtonHidden = function (parentElement) {
 		return parentElement.getElementsByClassName("hidden-submit")[0];
-	}
+	};
 
 	var toggle = function (element, state, type) {
 		element.style.display = state ? type : "none";
-	}
+	};
 	var toggleBlock = function (element, state) {
 		toggle(element, state, "block");
-	}
+	};
 	var toggleBlockDefault = function (element) {
 		var hidden = element.style.display === "none";
 		toggleBlock(element, hidden);
 	};
 	var toggleInline = function (element, state) {
 		toggle(element, state, "inline-block");
-	}
+	};
 	var toggleInlineDefault = function (element) {
 		var hidden = element.style.display === "none";
 		toggleInline(element, hidden);
 	};
 
 	return {
+
+		getSearchBox: getSearchBox,
 
 		getConfig: getConfig,
 		getNotifications: getNotifications,

@@ -1,10 +1,9 @@
-
 window.onload = function () {
 	initializeListeners();
 
 	// Default '#quick-reports' tab
 	if (document.location.hash == "" || document.location.hash == "#") {
-	    document.location.hash = "#/quick-reports";
+		loadLastTab();
 	}
 
 	// Load the configuration and then reload all
@@ -56,6 +55,16 @@ function initializeListeners() {
 	UTILS.addEvent(settingButton, "click", quickReportsSetting);
 	settingButton = utility.getMyTeamFoldersSettingButton();
 	UTILS.addEvent(settingButton, "click", teamFoldersSetting);
+
+	var cancelButton;
+	cancelButton = utility.getCancelButton(utility.getQuickReportsUrlsForm());
+	UTILS.addEvent(cancelButton, "click", function (){
+		utility.getQuickReportsUrlsForm().style.display = "none";
+	});
+	cancelButton = utility.getCancelButton(utility.getMyTeamFoldersUrlsForm());
+	UTILS.addEvent(cancelButton, "click", function (){
+		utility.getMyTeamFoldersUrlsForm().style.display = "none";
+	});
 }
 
 function loadConfiguration(callBack) {
@@ -86,18 +95,28 @@ function loadConfiguration(callBack) {
 			menuHint.className = "menu-hint";
 			menu.appendChild(menuHint);
 
+			var dropdownBox = document.createElement("a");
+			dropdownBox.className = "menu-dropdown u-plain-link";
+			menuHint.appendChild(dropdownBox);
+
 			var actionsLabel = document.createElement("p");
 			actionsLabel.innerHTML = sectionConfig.actionsLabel;
-			menuHint.appendChild(actionsLabel);
+			dropdownBox.appendChild(actionsLabel);
 
 			var arrow = document.createElement("div");
 			arrow.className = "arrow";
-			menuHint.appendChild(arrow);
+			dropdownBox.appendChild(arrow);
 
 			var actionList = document.createElement("ul");
 			actionList.className = "action-list";
 			menuHint.appendChild(actionList);
 
+			// Set the drop down link to refer to the first link in action list
+			if (sectionConfig.actions.length > 0) {
+				dropdownBox.href = sectionConfig.actions[0].url;
+			}
+
+			// Fill action list
 			for (var j = 0; j < sectionConfig.actions.length; j++) {
 				var action = sectionConfig.actions[j];
 				var li = document.createElement("li");
@@ -214,7 +233,7 @@ function loadCombobox(tag, combobox) {
 	combobox.style.display = "none";
 
 	// Read from local storage
-	var sites = storageUtility.readLocalStorage(tag);
+	var sites = storageUtility.readLocalStorageByTag(tag);
 	if (sites === undefined || sites.length === 0) {
 		return;
 	}
@@ -242,7 +261,7 @@ function loadurlsForm(tag, form) {
 	}
 
 	// Read from local storage
-	var sites = storageUtility.readLocalStorage(tag);
+	var sites = storageUtility.readLocalStorageByTag(tag);
 	if (sites === undefined || sites.length === 0) {
 		return;
 	}
@@ -311,7 +330,7 @@ function submiturlsForm(event, form, tag) {
 		utility.toggleInline(form, false);
 	}
 	if (allValid) {
-		storageUtility.writeLocalStorage(tag, sites);
+		storageUtility.writeLocalStorageByTag(tag, sites);
 		reloadAll();
 	} else {
 		// Not valid, invoke from.submit() for pop ups
@@ -341,6 +360,23 @@ function tabSelect(e) {
 	reloadSelectedTab();
 }
 
+function loadLastTab() {
+	var lastTab = storageUtility.readLocalStorageLastTab();
+	if (lastTab === undefined || lastTab === null) {
+		// If no last tab, select first tab
+		lastTab = "#/quick-reports"
+	}
+	var allTabs = utility.getTabSelectors();
+	for (var i = 0; i < allTabs.length; i++) {
+    	var tab = allTabs[i];
+    	var isCurrentTab = tab.hash === lastTab;
+    	if (isCurrentTab) {
+    		tab.click();
+    		return;
+    	}
+    }
+}
+
 function reloadSelectedTab() {
 	var currentHash = document.location.hash;
     var allTabs = utility.getTabSelectors();
@@ -358,12 +394,14 @@ function reloadSelectedTab() {
     	var selected = ("#/" + tab.id) === currentHash;
     	utility.toggleBlock(tab, selected);
     }
+
+    storageUtility.writeLocalStorageLastTab(currentHash);
 }
 
 function search(event) {
-	event.preventDefault();
 	var enterKeyCode = 13;
 	if (event.keyCode == 13) {
+		event.preventDefault();
 		var searchBox = utility.getSearchBox();
 		var text = searchBox.value;
 
@@ -531,6 +569,9 @@ var utility = (function() {
 	var getSubmitButtonHidden = function (parentElement) {
 		return parentElement.getElementsByClassName("hidden-submit")[0];
 	};
+	var getCancelButton = function (parentElement) {
+		return parentElement.getElementsByClassName("cancel")[0];
+	}
 
 	var toggle = function (element, state, type) {
 		element.style.display = state ? type : "none";
@@ -584,6 +625,7 @@ var utility = (function() {
 
 		getSubmitButton: getSubmitButton,
 		getSubmitButtonHidden: getSubmitButtonHidden,
+		getCancelButton: getCancelButton,
 
 		toggleBlock: toggleBlock,
 		toggleBlockDefault: toggleBlockDefault,
@@ -594,6 +636,7 @@ var utility = (function() {
 
 var storageUtility = (function () {
 	var dataTag = "WebAppData";
+	var lastTab = "lastTab";
 	var read = function () {
 		var dataStr = localStorage.getItem(dataTag);
 		if (dataStr === undefined || dataStr === null) {
@@ -616,7 +659,7 @@ var storageUtility = (function () {
 		localStorage.setItem(dataTag, dataStr);
 	};
 
-	var writeLocalStorage = function (tag, sites) {
+	var writeLocalStorageByTag = function (tag, sites) {
 		if (sites === undefined) {
 			return;
 		}
@@ -629,17 +672,33 @@ var storageUtility = (function () {
 
 		write(data);
 	};
-	var readLocalStorage = function (tag) {
+	var readLocalStorageByTag = function (tag) {
 		var data = read();
 		if (data === undefined) {
 			return undefined;
 		}
 		return data[tag];
 	};
-
+	var writeLocalStorageLastTab = function (tabName) {
+		var data = read();
+		if (data === undefined) {
+			data = {};
+		}
+		data[lastTab] = tabName;
+		write(data);
+	};
+	var readLocalStorageLastTab = function () {
+		var data = read();
+		if (data === undefined) {
+			return undefined;
+		}
+		return data[lastTab];
+	};
 
 	return {
-		writeLocalStorage: writeLocalStorage,
-		readLocalStorage: readLocalStorage
+		writeLocalStorageByTag: writeLocalStorageByTag,
+		readLocalStorageByTag: readLocalStorageByTag,
+		writeLocalStorageLastTab: writeLocalStorageLastTab,
+		readLocalStorageLastTab: readLocalStorageLastTab
 	}
 }());
